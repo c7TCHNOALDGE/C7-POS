@@ -4,6 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#17212E">
+<meta name="robots" content="noindex, nofollow, noarchive">
+<meta name="googlebot" content="noindex, nofollow">
 <title>C7 | المبيعات والمحاسبة</title>
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icon-192.png">
@@ -406,7 +408,7 @@ function renderLogin(msg=''){
     ${field('كلمة المرور',`<input id="lg-pass" type="password" autocomplete="current-password" dir="ltr" required>`)}
     <div class="err" id="lg-err">${esc(msg)}</div>
     <button class="btn pri" id="lg-btn" type="submit">دخول</button>
-    ${local?`<div class="hint">وضع التجربة على هذا الجهاز. الإدارة: <b dir="ltr">admin / 1234</b> . الموظف: <b dir="ltr">emp / 1234</b>. غيّر كلمات المرور من الإعدادات والموظفين.</div>`:`<div class="hint">الحساب يُنشئه المدير من قسم الموظفين. أول دخول بحساب أنشأته في Firebase يصبح حساب المدير.</div>`}
+    ${local?`<div class="hint">وضع التجربة على هذا الجهاز. الإدارة: <b dir="ltr">admin / 1234</b> . الموظف: <b dir="ltr">emp / 1234</b>. غيّر كلمات المرور من الإعدادات والموظفين.</div>`:''}
   </form></div>`;
   setTimeout(()=>{const i=$('#lg-user');i&&i.focus()},50);
 }
