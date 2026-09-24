@@ -261,7 +261,14 @@ main{padding:1.4rem 1.6rem 3rem;min-width:0;display:flex;flex-direction:column;g
    const FIREBASE_CONFIG = { apiKey:"...", authDomain:"...", projectId:"...", appId:"..." };
    إذا تركتها null سيطلب التطبيق الإعدادات عند أول تشغيل.
    ===================================================================== */
-const FIREBASE_CONFIG = null;
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyDn8MNmPLQIGlWT3ZmNmz5obgFkoFRIEo0",
+  authDomain: "c7-pos.firebaseapp.com",
+  projectId: "c7-pos",
+  storageBucket: "c7-pos.firebasestorage.app",
+  messagingSenderId: "783054577610",
+  appId: "1:783054577610:web:64100605ade9772398f933"
+};
 const EMAIL_DOMAIN = 'c7pos.app';
 const FB_VER = '10.12.2';
 
@@ -368,7 +375,7 @@ async function hash(s){
 }
 function loadScript(src){return new Promise((res,rej)=>{const s=document.createElement('script');s.src=src;s.onload=res;s.onerror=rej;document.head.appendChild(s)})}
 async function loadFirebase(){const b=`https://www.gstatic.com/firebasejs/${FB_VER}/`;await loadScript(b+'firebase-app-compat.js');await loadScript(b+'firebase-auth-compat.js');await loadScript(b+'firebase-firestore-compat.js')}
-const currentConfig=()=>FIREBASE_CONFIG||LS.get('c7pos_fbcfg',null);
+const currentConfig=()=>LS.get('c7pos_fbcfg',null)||FIREBASE_CONFIG;
 function parseConfig(txt){
   const o={};const re=/(\w+)\s*:\s*["']([^"']*)["']/g;let m;
   while((m=re.exec(txt)))o[m[1]]=m[2];
@@ -378,12 +385,12 @@ function parseConfig(txt){
 /* ---------------- التشغيل والدخول ---------------- */
 function renderLoading(msg,isErr){$('#app').innerHTML=`<div class="auth"><div class="auth-card"><div class="mark"><b>C7</b><div><strong>المبيعات والمحاسبة</strong><br><small>${esc(SET().companyName)}</small></div></div><p class="${isErr?'err':''}" style="margin:0">${esc(msg)}</p>${isErr?'<button class="btn pri" onclick="location.reload()">إعادة المحاولة</button>':''}</div></div>`}
 
-function renderSetup(){
+function renderSetup(warn=''){
   $('#app').innerHTML=`<div class="auth"><div class="auth-card" style="width:min(520px,100%)">
   <div class="mark"><b>C7</b><div><strong>تشغيل البرنامج لأول مرة</strong><br><small>اختر طريقة حفظ البيانات</small></div></div>
   <p style="margin:0">للعمل من أي مكان وأي جهاز (كمبيوتر وأندرويد) بنفس البيانات، اربط البرنامج بقاعدة بيانات Firebase الخاصة بك. الصق إعدادات المشروع (firebaseConfig) هنا:</p>
   ${field('إعدادات Firebase',`<textarea id="cfg" rows="6" dir="ltr" placeholder='{ apiKey: "...", authDomain: "...", projectId: "...", appId: "..." }'></textarea>`)}
-  <div class="err" id="cfg-err"></div>
+  <div class="err" id="cfg-err">${esc(warn)}</div>
   <button class="btn pri" onclick="saveConfig()">ربط وتشغيل</button>
   <div class="hint">تريد التجربة أولاً؟ <button class="link" onclick="LS.set('c7pos_mode','local');location.reload()">جرّب البرنامج على هذا الجهاز فقط</button>. في وضع التجربة تبقى البيانات داخل هذا المتصفح ولا تُشارَك مع الأجهزة الأخرى.</div>
   </div></div>`;
@@ -416,7 +423,7 @@ async function doLogin(){
     if(usr.active===false){err.textContent='هذا الحساب موقوف. تواصل مع الإدارة.';return}
     LS.set('c7pos_session',usr.id);enter(usr);
   }else{
-    try{await DB.auth.signInWithEmailAndPassword(`${u}@${EMAIL_DOMAIN}`,p)}catch(e){err.textContent=authMsg(e);btn.disabled=false}
+    try{await DB.auth.signInWithEmailAndPassword(`${u}@${EMAIL_DOMAIN}`,p)}catch(e){if(/api-key/.test((e&&e.code)||'')){LS.del('c7pos_fbcfg');return renderSetup('مفتاح الربط (apiKey) غير صحيح. انسخ كتلة firebaseConfig من إعدادات مشروع Firebase بزر النسخ والصقها هنا.')}err.textContent=authMsg(e);btn.disabled=false}
   }
 }
 
